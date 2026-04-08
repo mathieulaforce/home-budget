@@ -14,10 +14,12 @@ export default async function AccountsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight">Accounts</h1>
-        <Button render={<Link href="/accounts/new" />}>
-          <Plus data-icon="inline-start" />
-          New Account
-        </Button>
+        <Link href="/accounts/new">
+          <Button>
+            <Plus data-icon="inline-start" />
+            New Account
+          </Button>
+        </Link>
       </div>
 
       {accounts.length === 0 ? (
@@ -26,10 +28,12 @@ export default async function AccountsPage() {
             <p className="text-muted-foreground mb-4">
               No accounts yet. Create your first account to get started.
             </p>
-            <Button render={<Link href="/accounts/new" />}>
-              <Plus data-icon="inline-start" />
-              Create Account
-            </Button>
+            <Link href="/accounts/new">
+              <Button>
+                <Plus data-icon="inline-start" />
+                Create Account
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       ) : (
