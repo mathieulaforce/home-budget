@@ -11,12 +11,16 @@ import { revalidatePath } from "next/cache";
 
 type AccountType = "checking" | "savings" | "investment" | "credit_card";
 
-async function isDuplicateAccount(
+async function isDuplicateActiveAccount(
   name: string,
   type: AccountType,
   excludeId?: number
 ) {
-  const conditions = [eq(accounts.name, name), eq(accounts.type, type)];
+  const conditions = [
+    eq(accounts.name, name),
+    eq(accounts.type, type),
+    eq(accounts.isActive, true),
+  ];
   if (excludeId !== undefined) conditions.push(ne(accounts.id, excludeId));
 
   const existing = await db.query.accounts.findFirst({
@@ -29,8 +33,8 @@ export async function createAccount(input: unknown) {
   const parsed = createAccountSchema.safeParse(input);
   if (!parsed.success) return { success: false as const, error: parsed.error.flatten() };
 
-  if (await isDuplicateAccount(parsed.data.name, parsed.data.type)) {
-    return { success: false as const, error: "An account with this name and type already exists" };
+  if (await isDuplicateActiveAccount(parsed.data.name, parsed.data.type)) {
+    return { success: false as const, error: "An active account with this name and type already exists" };
   }
 
   const [result] = await db.insert(accounts).values(parsed.data).$returningId();
@@ -47,8 +51,8 @@ export async function updateAccount(id: number, input: unknown) {
 
   const name = parsed.data.name ?? existing.name;
   const type = parsed.data.type ?? existing.type;
-  if (await isDuplicateAccount(name, type, id)) {
-    return { success: false as const, error: "An account with this name and type already exists" };
+  if (await isDuplicateActiveAccount(name, type, id)) {
+    return { success: false as const, error: "An active account with this name and type already exists" };
   }
 
   await db.update(accounts).set(parsed.data).where(eq(accounts.id, id));

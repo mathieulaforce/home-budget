@@ -25,7 +25,7 @@ export const accounts = mysqlTable(
     updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow(),
   },
   (table) => ({
-    nameTypeIdx: uniqueIndex("name_type_idx").on(table.name, table.type),
+    nameTypeIdx: index("name_type_idx").on(table.name, table.type),
   })
 );
 

@@ -21,7 +21,7 @@ export async function getTransactionTotal(accountId: number): Promise<number> {
     .from(transactions)
     .where(eq(transactions.accountId, accountId));
 
-  return result?.total ?? 0;
+  return Number(result?.total) || 0;
 }
 
 export async function getAccountBalance(accountId: number): Promise<number> {
@@ -60,6 +60,6 @@ export async function getAccountsWithBalances() {
     isActive: r.isActive,
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,
-    balance: r.initialBalance + r.txTotal,
+    balance: r.initialBalance + Number(r.txTotal),
   }));
 }

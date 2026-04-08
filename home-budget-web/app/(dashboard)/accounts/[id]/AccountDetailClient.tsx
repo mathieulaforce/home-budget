@@ -153,6 +153,7 @@ export function AccountDetailClient({ account }: { account: AccountWithBalance }
           </SheetHeader>
           <div className="p-4">
             <AccountForm
+              key={account.id}
               mode="edit"
               accountId={account.id}
               defaultValues={{

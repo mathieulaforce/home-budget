@@ -5,6 +5,7 @@ import type {
   CreateAccountInput,
   UpdateAccountInput,
 } from "@/lib/validators/accounts";
+import { ApiError } from "@/lib/errors/api-error";
 
 export type AccountWithBalance = InferSelectModel<typeof accounts> & {
   balance: number;
@@ -49,8 +50,13 @@ export function useCreateAccount() {
         body: JSON.stringify(input),
       });
       if (!res.ok) {
-        const json = await res.json();
-        throw new Error(json.error ? JSON.stringify(json.error) : "Failed to create account");
+        let json: { error?: unknown };
+        try {
+          json = await res.json();
+        } catch {
+          throw new ApiError("Failed to create account");
+        }
+        throw ApiError.fromResponse(json.error);
       }
       return res.json();
     },
@@ -69,8 +75,13 @@ export function useUpdateAccount(id: number) {
         body: JSON.stringify(input),
       });
       if (!res.ok) {
-        const json = await res.json();
-        throw new Error(json.error ? JSON.stringify(json.error) : "Failed to update account");
+        let json: { error?: unknown };
+        try {
+          json = await res.json();
+        } catch {
+          throw new ApiError("Failed to update account");
+        }
+        throw ApiError.fromResponse(json.error);
       }
       return res.json();
     },
