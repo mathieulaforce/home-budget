@@ -12,16 +12,22 @@ import {
 } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
 
-export const accounts = mysqlTable("accounts", {
-  id: int("id").primaryKey().autoincrement(),
-  name: varchar("name", { length: 100 }).notNull(),
-  type: mysqlEnum("type", ["checking", "savings", "investment", "credit_card"]).notNull(),
-  currency: varchar("currency", { length: 3 }).notNull().default("EUR"),
-  initialBalance: int("initial_balance").notNull().default(0),
-  isActive: boolean("is_active").notNull().default(true),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow(),
-});
+export const accounts = mysqlTable(
+  "accounts",
+  {
+    id: int("id").primaryKey().autoincrement(),
+    name: varchar("name", { length: 100 }).notNull(),
+    type: mysqlEnum("type", ["checking", "savings", "investment", "credit_card"]).notNull(),
+    currency: varchar("currency", { length: 3 }).notNull().default("EUR"),
+    initialBalance: int("initial_balance").notNull().default(0),
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow(),
+  },
+  (table) => ({
+    nameTypeIdx: uniqueIndex("name_type_idx").on(table.name, table.type),
+  })
+);
 
 export const accountsRelations = relations(accounts, ({ many }) => ({
   transactions: many(transactions),
