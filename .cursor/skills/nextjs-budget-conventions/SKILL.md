@@ -126,6 +126,96 @@ export const db = drizzle(connection, { schema, mode: "default" });
 3. Run `npx drizzle-kit push` to apply to local DB
 4. Commit the migration files
 
+## Domain-Driven Design (DDD) Practices
+
+Apply DDD principles within the existing Next.js layered architecture:
+
+### Layer Responsibilities
+
+```
+lib/
+  domain/                  # Domain layer — pure types & business logic
+    {module}/
+      types.ts             # Domain entities, value objects, interfaces
+      service.ts           # Domain services (stateless business rules)
+  validators/              # Input DTOs (Zod schemas for external input)
+  queries/                 # Repository-like data access (translate DB ↔ domain)
+  actions/                 # Application services (orchestrate domain + infra)
+```
+
+### Domain Types vs DB Types
+
+- **Domain types** live in `lib/domain/{module}/types.ts` — framework-agnostic TypeScript interfaces.
+- **DB types** are Drizzle `InferSelectModel<>` — only used inside queries/repositories.
+- Queries translate DB rows into domain types before returning.
+
+```typescript
+// lib/domain/transactions/types.ts
+export interface Transaction {
+  id: number;
+  accountId: number;
+  accountName: string;
+  categoryId: number | null;
+  categoryName: string | null;
+  categoryGroup: string | null;
+  date: Date;
+  description: string;
+  amount: number;
+  notes: string | null;
+  importHash: string | null;
+  createdAt: Date;
+}
+
+export interface PaginatedResult<T> {
+  data: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+```
+
+### Domain Services
+
+Business logic that doesn't belong in a single entity goes in a domain service:
+
+```typescript
+// lib/domain/budgets/service.ts
+export function computeVariance(planned: number, actual: number, isIncome: boolean): {
+  variance: number;
+  variancePercent: number;
+} { ... }
+```
+
+### Value Objects
+
+Use typed helpers for recurring domain concepts:
+
+| Concept | Representation | Location |
+|---------|---------------|----------|
+| Money | `number` (cents, integer) | Convention, enforced via Zod `.int()` |
+| DateRange | `{ start: Date; end: Date }` | `lib/domain/shared/types.ts` |
+| ImportHash | `string` (SHA-256 hex) | `lib/domain/transactions/types.ts` |
+
+### Bounded Contexts
+
+Each feature module is a bounded context with its own domain types:
+
+| Context | Directory | Core Entities |
+|---------|-----------|---------------|
+| Accounts | `domain/accounts/` | Account, AccountBalance |
+| Transactions | `domain/transactions/` | Transaction, Category |
+| Import | `domain/import/` | ImportedRow, BankFormat, ParseResult |
+| Budgets | `domain/budgets/` | Budget, BudgetItem, BudgetComparison |
+| Dashboard | `domain/dashboard/` | DashboardSummary, PeriodSelection |
+| Comparisons | `domain/comparisons/` | PeriodComparison, BenchmarkComparison |
+| Stocks | `domain/stocks/` | Holding, PortfolioSummary, StockPrice |
+
+### Aggregate Rules
+
+- **Account** is an aggregate root — balance is derived from initial_balance + transactions.
+- **Budget** is an aggregate root — always create/update budget + items together in a DB transaction.
+- **Transaction** belongs to the Account aggregate — deleting/creating transactions must revalidate account balance.
+
 ## Coding Conventions
 
 ### Naming
