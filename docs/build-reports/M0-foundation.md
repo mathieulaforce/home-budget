@@ -70,6 +70,7 @@ docker compose up -d
 ```
 
 **Acceptance:**
+
 - `git status` works at `home-budget/`
 - `docker compose ps` shows mariadb running and healthy
 - Can connect: `docker exec -it home-budget-mariadb-1 mariadb -ubudget_user -pbudgetpass home_budget`
@@ -102,6 +103,7 @@ npx shadcn@latest add chart
 ```
 
 **Acceptance:**
+
 - All packages in `package.json`
 - `components/ui/` populated by shadcn with all listed components
 - `lib/utils.ts` exists with `cn()` helper (created by shadcn init)
@@ -174,6 +176,7 @@ npx drizzle-kit push
 ```
 
 **Acceptance:**
+
 - All 7 tables exist in MariaDB: `accounts`, `categories`, `transactions`, `budgets`, `budget_items`, `stock_holdings`, `stock_prices`
 - `npx drizzle-kit studio` opens and shows the tables
 
@@ -214,11 +217,13 @@ seed().catch((err) => {
 ```
 
 Add to `package.json` scripts:
+
 - `"db:seed": "dotenv -e .env.local -- tsx lib/db/seed.ts"`
 - `"db:generate": "dotenv -e .env.local -- drizzle-kit generate"`
 - `"db:studio": "dotenv -e .env.local -- drizzle-kit studio"`
 
 **Acceptance:**
+
 - Running `npm run db:seed` inserts 30 categories
 - Categories are queryable: `SELECT * FROM categories ORDER BY sort_order;`
 
@@ -256,6 +261,7 @@ export function QueryProvider({ children }: { children: ReactNode }) {
 Wire into `app/layout.tsx`: wrap `{children}` with `<QueryProvider>`.
 
 **Acceptance:**
+
 - React Query DevTools (optional) shows in browser
 - No hydration errors
 
@@ -278,14 +284,16 @@ Use shadcn `Sidebar`, `SidebarContent`, `SidebarGroup`, `SidebarMenu`, `SidebarM
 
 Navigation items:
 
-| Label | Icon | Path |
-|-------|------|------|
-| Overview | LayoutDashboard | `/(dashboard)/overview` |
-| Accounts | Wallet | `/(dashboard)/accounts` |
-| Transactions | ArrowLeftRight | `/(dashboard)/transactions` |
-| Budgets | Target | `/(dashboard)/budgets` |
-| Comparisons | BarChart3 | `/(dashboard)/comparisons` |
-| Stocks | TrendingUp | `/(dashboard)/stocks` |
+
+| Label        | Icon            | Path                        |
+| ------------ | --------------- | --------------------------- |
+| Overview     | LayoutDashboard | `/(dashboard)/overview`     |
+| Accounts     | Wallet          | `/(dashboard)/accounts`     |
+| Transactions | ArrowLeftRight  | `/(dashboard)/transactions` |
+| Budgets      | Target          | `/(dashboard)/budgets`      |
+| Comparisons  | BarChart3       | `/(dashboard)/comparisons`  |
+| Stocks       | TrendingUp      | `/(dashboard)/stocks`       |
+
 
 Use `lucide-react` icons (installed by shadcn).
 
@@ -294,6 +302,7 @@ Active link highlighting based on current pathname (use `usePathname()`).
 ### `home-budget-web/components/layout/Header.tsx`
 
 Top bar with:
+
 - `SidebarTrigger` (hamburger to toggle sidebar on mobile)
 - Breadcrumb showing current section name
 
@@ -317,6 +326,7 @@ Create minimal placeholder pages that render the section title in a `<Card>`:
 Redirect to `/(dashboard)/overview` using `redirect()` from `next/navigation`.
 
 **Acceptance:**
+
 - App starts with `npm run dev`
 - Sidebar shows 6 navigation items
 - Clicking each item navigates to its placeholder page
@@ -365,6 +375,7 @@ export function toISODate(date: Date): string {
 ```
 
 **Acceptance:**
+
 - `formatCurrency(123456)` returns `"€ 1.234,56"` (Belgian nl-BE format)
 - `formatDate(new Date("2026-04-08"))` returns `"08 apr. 2026"` (Dutch Belgian format)
 - `toISODate` uses local date parts, not UTC (no day-shift for positive UTC offsets)
@@ -413,3 +424,4 @@ home-budget/
             ├── comparisons/page.tsx
             └── stocks/page.tsx
 ```
+

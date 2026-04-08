@@ -84,6 +84,7 @@ export async function getAccountsWithBalances() {
 ```
 
 **Acceptance:**
+
 - `getAccounts()` returns array of active accounts
 - `getAccountBalance(id)` returns `initialBalance` when no transactions exist
 - `getAccountsWithBalances()` returns accounts with balance field
@@ -137,18 +138,22 @@ export async function toggleAccountActive(id: number) {
 
 ### `home-budget-web/app/api/accounts/route.ts`
 
-| Method | Description | Request | Response |
-|--------|------------|---------|----------|
-| GET | List all active accounts with balances | - | `{ data: AccountWithBalance[] }` |
-| POST | Create new account | `CreateAccountInput` JSON body | `{ data: { id: number } }` or `{ error: string }` |
+
+| Method | Description                            | Request                        | Response                                          |
+| ------ | -------------------------------------- | ------------------------------ | ------------------------------------------------- |
+| GET    | List all active accounts with balances | -                              | `{ data: AccountWithBalance[] }`                  |
+| POST   | Create new account                     | `CreateAccountInput` JSON body | `{ data: { id: number } }` or `{ error: string }` |
+
 
 ### `home-budget-web/app/api/accounts/[id]/route.ts`
 
-| Method | Description | Request | Response |
-|--------|------------|---------|----------|
-| GET | Get single account with balance | - | `{ data: AccountWithBalance }` or 404 |
-| PUT | Update account fields | `UpdateAccountInput` JSON body | `{ data: { success: true } }` or `{ error }` |
-| PATCH | Toggle active/inactive | - | `{ data: { success: true } }` |
+
+| Method | Description                     | Request                        | Response                                     |
+| ------ | ------------------------------- | ------------------------------ | -------------------------------------------- |
+| GET    | Get single account with balance | -                              | `{ data: AccountWithBalance }` or 404        |
+| PUT    | Update account fields           | `UpdateAccountInput` JSON body | `{ data: { success: true } }` or `{ error }` |
+| PATCH  | Toggle active/inactive          | -                              | `{ data: { success: true } }`                |
+
 
 Validate all POST/PUT bodies with Zod. Return 400 with `{ error }` on validation failure.
 
@@ -249,14 +254,17 @@ export function useToggleAccountActive(id: number) {
 
 **Fields:**
 
-| Field | Type | Component | Validation |
-|-------|------|-----------|------------|
-| name | text | shadcn `Input` | Required, max 100 chars |
-| type | select | shadcn `Select` | Required, one of: checking, savings, investment, credit_card |
-| currency | text | shadcn `Input` | 3-char ISO code, default "EUR" |
+
+| Field          | Type   | Component                      | Validation                                                   |
+| -------------- | ------ | ------------------------------ | ------------------------------------------------------------ |
+| name           | text   | shadcn `Input`                 | Required, max 100 chars                                      |
+| type           | select | shadcn `Select`                | Required, one of: checking, savings, investment, credit_card |
+| currency       | text   | shadcn `Input`                 | 3-char ISO code, default "EUR"                               |
 | initialBalance | number | shadcn `Input` (type="number") | Integer (user enters EUR amount, convert to cents on submit) |
 
+
 **Behavior:**
+
 - On submit: call `useCreateAccount().mutate()` for new, `useUpdateAccount(id).mutate()` for edit
 - On success: show toast (sonner), navigate to `/accounts`
 - On error: show field-level errors from Zod
@@ -272,6 +280,7 @@ export function useToggleAccountActive(id: number) {
 Server Component that shows all accounts with balances.
 
 **Layout:**
+
 ```
 ┌─────────────────────────────────────────────────┐
 │ Accounts                        [+ New Account] │
@@ -311,6 +320,7 @@ Server Component that shows all accounts with balances.
 Server Component that loads the account, then renders a Client Component for interactivity.
 
 **Layout:**
+
 ```
 ┌────────────────────────────────────────────────┐
 │ ← Back    ING Checking              [Edit] [⋮] │
@@ -362,3 +372,4 @@ home-budget-web/
         ├── new/page.tsx
         └── [id]/page.tsx
 ```
+
